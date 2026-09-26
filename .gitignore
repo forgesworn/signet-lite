@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.superpowers/
+*.log
+src/**/*.js
+test-results/
+playwright-report/
+.playwright-mcp/
+.claude/
+.env
+.env.*

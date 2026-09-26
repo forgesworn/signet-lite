@@ -1,0 +1,308 @@
+/* My Signet Lite — Design System */
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #FAF7ED;
+  --bg-secondary: #F2EEE1;
+  --bg-card: #FFFFFF;
+  --bg-card-alt: #EDE8DA;
+  --text-primary: #0E2A47;
+  --text-secondary: #596979;
+  --text-muted: #6B7886;
+  --accent: #0E2A47;
+  --accent-hover: #173A5E;
+  --accent-light: #E4E9EF;
+  --accent-text: #0E2A47;
+  --on-accent: #FAF7ED;
+  --brand-navy: #0E2A47;
+  --brand-gold: #C9A962;
+  --brand-ivory: #FAF7ED;
+  --brand-mist: #A7B0B8;
+  --brand-gold-text: #8A6D2E;
+  --brand-gold-light: #F3EAD3;
+  --success: #059669;
+  --success-light: #D1FAE5;
+  --warning: #D97706;
+  --warning-light: #FEF3C7;
+  --danger: #DC2626;
+  --danger-light: #FEE2E2;
+  --border: rgba(14, 42, 71, 0.14);
+  --shadow: 0 1px 2px rgba(14, 42, 71, 0.06);
+  --shadow-lg: 0 4px 14px rgba(14, 42, 71, 0.08);
+  --focus-ring: #0E2A47;
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* Missing variables — referenced in components but never defined */
+  --bg-input: #F5F1E6;
+
+  /* Typography — @fontsource-variable faces imported in main.tsx. Exact
+     family names come from @fontsource-variable/inter and
+     @fontsource-variable/playfair-display's wght.css. */
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Playfair Display Variable', Georgia, 'Times New Roman', serif;
+
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #081B2D;
+  --bg-secondary: #0C2338;
+  --bg-card: #102F4D;
+  --bg-card-alt: #173A5E;
+  --text-primary: #FAF7ED;
+  --text-secondary: #A7B0B8;
+  --text-muted: #7D8A97;
+  --accent: #C9A962;
+  --accent-hover: #D6BA7A;
+  --accent-light: rgba(201, 169, 98, 0.16);
+  --accent-text: #E3CC94;
+  --on-accent: #0E2A47;
+  --brand-gold-text: #D9BF84;
+  --brand-gold-light: rgba(201, 169, 98, 0.14);
+  --success: #10B981;
+  --success-light: #064E3B;
+  --warning: #F59E0B;
+  --warning-light: #78350F;
+  --danger: #EF4444;
+  --danger-light: #7F1D1D;
+  --border: rgba(250, 247, 237, 0.14);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --focus-ring: #C9A962;
+  --bg-input: #0C2338;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-primary: #081B2D;
+    --bg-secondary: #0C2338;
+    --bg-card: #102F4D;
+    --bg-card-alt: #173A5E;
+    --text-primary: #FAF7ED;
+    --text-secondary: #A7B0B8;
+    --text-muted: #7D8A97;
+    --accent: #C9A962;
+    --accent-hover: #D6BA7A;
+    --accent-light: rgba(201, 169, 98, 0.16);
+    --accent-text: #E3CC94;
+    --on-accent: #0E2A47;
+    --brand-gold-text: #D9BF84;
+    --brand-gold-light: rgba(201, 169, 98, 0.14);
+    --success: #10B981;
+    --success-light: #064E3B;
+    --warning: #F59E0B;
+    --warning-light: #78350F;
+    --danger: #EF4444;
+    --danger-light: #7F1D1D;
+    --border: rgba(250, 247, 237, 0.14);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --focus-ring: #C9A962;
+    --bg-input: #0C2338;
+  }
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+h1 { font-family: var(--font-display); font-size: 1.75rem; font-weight: 600; letter-spacing: 0; }
+h2 { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; }
+h3 { font-size: 1rem; font-weight: 600; }
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─── BrandMark — tone="auto" ───
+   Both the on-light and on-dark emblem variants render; CSS shows only the
+   right one for the ancestor theme: an explicit html[data-theme] toggle, or
+   system dark preference when the root hasn't gone explicitly light. */
+.brand-mark-auto { display: inline-flex; align-items: center; }
+.brand-mark-auto .brand-on-dark { display: none; }
+[data-theme="dark"] .brand-mark-auto .brand-on-light { display: none; }
+[data-theme="dark"] .brand-mark-auto .brand-on-dark { display: inline-block; }
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .brand-mark-auto .brand-on-light { display: none; }
+  html:not([data-theme="light"]) .brand-mark-auto .brand-on-dark { display: inline-block; }
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms ease, transform 100ms ease;
+  width: 100%;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:disabled:active { transform: none; }
+
+/* PIN keypad keys — tuned for zero-latency feel on mobile.
+   `touch-action: manipulation` removes the residual ~50-300ms double-tap-zoom
+   wait that some mobile browsers impose even with `user-scalable=no`.
+   `-webkit-tap-highlight-color: transparent` suppresses the OS blue flash
+   so the :active scale is the sole visual cue, and arrives the instant the
+   touch lands rather than after React commits. */
+.signet-pinpad-key {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 60ms ease, background 120ms ease;
+}
+.signet-pinpad-key:active:not(:disabled) {
+  transform: scale(0.94);
+  background: var(--accent-light) !important;
+}
+.signet-pinpad-key:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+  padding: 8px 16px;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+.btn-danger:hover:not(:disabled) { filter: brightness(0.92); }
+
+/* Button sizes */
+.btn-sm { padding: 8px 16px; font-size: 0.875rem; }
+.btn-lg { padding: 16px; font-size: 1rem; }
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 200ms ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.page {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section { margin-bottom: 24px; }
+.section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.signet-word {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 8px 16px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+/* Card variants */
+.card-warning {
+  background: var(--warning-light);
+  border-color: var(--warning);
+}
+
+.card-danger {
+  background: var(--danger-light);
+  border-color: var(--danger);
+}
+
+/* Explain-mode helper note — a soft, low-key band of guidance text. */
+.hint {
+  background: var(--accent-light);
+  color: var(--accent-text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 200ms ease forwards;
+}

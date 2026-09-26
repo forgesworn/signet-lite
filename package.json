@@ -1,0 +1,55 @@
+{
+  "name": "signet-lite",
+  "version": "0.13.2",
+  "description": "My Signet Lite — a web-based Nostr remote signer (NIP-46) PWA",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forgesworn/signet-lite.git"
+  },
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:compat": "vitest run src/engine/signer.conformance.test.ts src/engine/signer.signet-login-conformance.test.ts src/engine/signer.signet-login-sdk-compat.test.ts",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/playfair-display": "^5.3.0",
+    "@scure/bip39": "^2.2.0",
+    "idb": "^8.0.3",
+    "jsqr": "^1.4.0",
+    "nostr-tools": "^2.23.0",
+    "nsec-tree": "^1.4.2",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^4.1.9",
+    "workbox-build": "^7.4.1",
+    "workbox-window": "^7.4.1"
+  }
+}

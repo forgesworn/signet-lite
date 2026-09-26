@@ -1,0 +1,75 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Least privilege — this job only reads the repo and deploys over SSH; it never
+# writes back to GitHub. Pin the default GITHUB_TOKEN to read-only (mirrors the
+# signet-app security audit 2026-06-15).
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Actions pinned to commit SHA (not floating tags) for supply-chain
+      # integrity — same pins as the audited signet-app workflow.
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `npm run build` is `tsc --noEmit && vite build`, so the typecheck gate
+      # runs here as part of the build.
+      - name: Unit + component tests
+        run: npm test
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Build
+        run: npm run build
+
+      # Build emits a fully static bundle to dist/ (incl. service worker and
+      # _headers); rsync it to the webroot, --delete pruning removed files.
+      # Target host is not hardcoded here — it's the repo secret DEPLOY_HOST
+      # (hostname or IP of the production deploy target), and its SSH host
+      # keys are the repo secret DEPLOY_KNOWN_HOSTS (an `ssh-keyscan`-style
+      # known_hosts block, pinned once by the infra owner against their own
+      # trust record). Both are secrets rather than variables so neither is
+      # printed in the public Actions log. Never ssh-keyscan per run: TOFU
+      # could redirect the rsync. Same pattern as signet-app.
+      - name: Deploy to Hetzner
+        env:
+          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$HETZNER_SSH_KEY" ]; then
+            echo "::error::HETZNER_SSH_KEY is not set — cannot deploy"
+            exit 1
+          fi
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
+            echo "::error::DEPLOY_HOST / DEPLOY_KNOWN_HOSTS repo secrets are not set — cannot deploy"
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          echo "$HETZNER_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          rsync -avz --delete \
+            -e "ssh -i $HOME/.ssh/deploy_key -o UserKnownHostsFile=$HOME/.ssh/known_hosts -o StrictHostKeyChecking=yes" \
+            dist/ "deploy@${DEPLOY_HOST}:/opt/signet-lite/"

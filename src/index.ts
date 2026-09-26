@@ -1,0 +1,7 @@
+export const version = '0.1.0'
+export { generateMnemonic } from './engine/mnemonic.js'
+export { deriveIdentity } from './engine/derive.js'
+export { Signer } from './engine/signer.js'
+export type { ApprovalRequest } from './engine/signer.js'
+export { SignerRelay, createSimplePool, type RelayPool } from './engine/relay.js'
+export { encryptSecret, decryptSecret, isEncrypted, encryptWithKey, decryptWithKey } from './engine/crypto-store.js'
