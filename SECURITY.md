@@ -5,7 +5,7 @@
 My Signet Lite holds Nostr signing keys, so we take reports seriously. Please report
 vulnerabilities privately, and do not open a public issue.
 
-**Email:** security@forgesworn.dev
+**Email:** security@safety.forgesworn.dev
 
 Please include:
 
