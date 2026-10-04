@@ -95,4 +95,13 @@ describe('approval-policy', () => {
     expect(resolveApproval(a, 'nip44_encrypt')).toBe('allow')      // dm category, untouched
     expect(resolveApproval(a, 'sign_event', 0)).toBe('allow')       // profile category, untouched
   })
+
+  it('always asks for a login challenge, whatever the app may sign silently', () => {
+    const trusted = app({ policies: { sign: 'always', dm: 'always' }, kindPolicies: { '22242': 'always' } })
+    const loginDetails = { kind: 22242, createdAt: 0, tags: [['relay', 'https://node.example'], ['code', '5021']], content: '' }
+    expect(resolveApproval(trusted, 'sign_event', 22242, loginDetails)).toBe('ask')
+    // Plain NIP-42 relay auth (no code) still follows the app's policy.
+    const relayAuth = { kind: 22242, createdAt: 0, tags: [['relay', 'wss://relay.example'], ['challenge', 'x']], content: '' }
+    expect(resolveApproval(trusted, 'sign_event', 22242, relayAuth)).toBe('allow')
+  })
 })

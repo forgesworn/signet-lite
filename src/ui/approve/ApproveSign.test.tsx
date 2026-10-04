@@ -167,4 +167,21 @@ describe('ApproveSign', () => {
     expect(container.textContent).toContain('hi there')
     expect(container.textContent).toContain('second line')
   })
+
+  it('shows a login challenge as a login with its code, and never offers always-allow', async () => {
+    const onDecide = vi.fn()
+    const login = {
+      identityName: 'me',
+      clientPubkey: 'abcd1234',
+      method: 'sign_event',
+      eventPreview: 'Log in to node',
+      eventDetails: { kind: 22242, createdAt: 0, tags: [['challenge', 'ab'], ['relay', 'https://demo.example.org'], ['code', '5021']], content: 'Log in to node' },
+    }
+    render(<ApproveSign explain={false} req={login} appName="Archipelago" onDecide={onDecide} />)
+    expect(screen.getByText('Log in to demo.example.org')).toBeInTheDocument()
+    expect(screen.getByTestId('login-challenge')).toHaveTextContent('5021')
+    expect(screen.queryByLabelText(/always allow/i)).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: /approve/i }))
+    expect(onDecide).toHaveBeenCalledWith(true, false)
+  })
 })

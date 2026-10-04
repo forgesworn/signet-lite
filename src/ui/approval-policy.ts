@@ -1,6 +1,8 @@
 import type { ApprovalRequest } from '../engine/signer.js'
 import { appPolicies, type AppPolicies, type StoredApp } from '../app/db.js'
 import { ZAP_REQUEST_KIND } from '../engine/zap.js'
+import { loginChallenge } from '../engine/login-challenge.js'
+import type { EventApprovalDetails } from '../engine/signer.js'
 
 /** The outcome of checking an app's policy for a request. */
 export type Decision = 'allow' | 'ask' | 'decline'
@@ -19,7 +21,15 @@ export function categoryForRequest(method: string, kind?: number): keyof AppPoli
 }
 
 /** Decide whether a request auto-allows, needs a prompt, or is declined outright. */
-export function resolveApproval(app: StoredApp | undefined, method: string, kind?: number): Decision {
+export function resolveApproval(
+  app: StoredApp | undefined,
+  method: string,
+  kind?: number,
+  details?: EventApprovalDetails,
+): Decision {
+  // A login challenge (kind 22242 with a code to compare) always asks: the person has to check
+  // the code against the login page, so no "always allow" may sign it silently.
+  if (method === 'sign_event' && loginChallenge(details)) return 'ask'
   const category = categoryForRequest(method, kind)
   if (!category) return 'allow' // benign method — never gated
   const policies = appPolicies(app ?? {})

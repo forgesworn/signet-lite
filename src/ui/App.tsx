@@ -256,7 +256,7 @@ export default function App() {
     // L1: lock()/delete landed while the app lookup was in flight — the session behind this
     // request is already gone. Deny without ever enqueueing a prompt on a locked app.
     if (sessionEpochRef.current !== epoch) return { ok: false, auto: true, rateLimited: false }
-    let decision = resolveApproval(app, req.method, req.eventDetails?.kind)
+    let decision = resolveApproval(app, req.method, req.eventDetails?.kind, req.eventDetails)
     // Bound silent auto-signing: an over-budget always-app is downgraded to a prompt (never
     // hard-blocked), so a runaway or compromised app hits friction and the user stays in control.
     let rateLimited = false

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ApprovalRequest } from '../../engine/signer.js'
 import { Hint } from '../components/Hint'
 import { sanitizeDisplayName } from '../../engine/text-sanitize.js'
+import { loginChallenge } from '../../engine/login-challenge.js'
 
 /** Caps for display text. Generous: this is for legibility, not truncating what is signed. */
 const NAME_MAX = 100
@@ -70,7 +71,11 @@ export function ApproveSign({ req, appName: rawAppName, explain, rateLimited = f
 
   const { action: methodAction, category } = describe(cleanName(req.method))
   const zap = req.eventDetails?.zap
-  const action = zap ? 'Send a Lightning zap as you' : methodAction
+  const login = req.method === 'sign_event' ? loginChallenge(req.eventDetails) : null
+  const loginSite = login?.site ? cleanName(login.site) : undefined
+  const action = login
+    ? loginSite ? `Log in to ${loginSite}` : 'Log in to a site'
+    : zap ? 'Send a Lightning zap as you' : methodAction
 
   // "Always allow" is granular for signing: it grants only THIS kind (kind 0 is a profile
   // write, which keeps its category-wide choice). DMs stay category-wide too. A zap (kind 9734)
@@ -113,6 +118,18 @@ export function ApproveSign({ req, appName: rawAppName, explain, rateLimited = f
           <p style={{ color: 'var(--text-muted)', fontSize: 11.5, margin: '4px 0 0', fontFamily: 'monospace' }}>{cleanName(req.method)}</p>
         )}
       </div>
+
+      {login && (
+        <div className="card" data-testid="login-challenge" style={{ marginBottom: 16, borderColor: 'var(--accent, #f7931a)', background: 'color-mix(in srgb, var(--accent, #f7931a) 8%, transparent)' }}>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 4px', fontWeight: 600 }}>Login code</p>
+          <p aria-label={`Code ${login.code.split('').join(' ')}`} style={{ margin: 0, fontSize: 32, fontWeight: 700, letterSpacing: '0.2em', fontVariantNumeric: 'tabular-nums' }}>
+            {login.code}
+          </p>
+          <p style={{ margin: '6px 0 0', fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+            Approve only if the login page shows the same code and you just tried to log in. Otherwise, deny.
+          </p>
+        </div>
+      )}
 
       {zap && (
         <div className="card" style={{ marginBottom: 16, borderColor: 'var(--accent, #f7931a)', background: 'color-mix(in srgb, var(--accent, #f7931a) 8%, transparent)' }}>
@@ -165,7 +182,7 @@ export function ApproveSign({ req, appName: rawAppName, explain, rateLimited = f
         </div>
       )}
 
-      <div className="card" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+      {!login && <div className="card" style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
         <input
           type="checkbox"
           id="always-allow"
@@ -176,13 +193,13 @@ export function ApproveSign({ req, appName: rawAppName, explain, rateLimited = f
         <label htmlFor="always-allow" style={{ fontSize: 14, cursor: 'pointer' }}>
           {alwaysLabel}
         </label>
-      </div>
+      </div>}
 
       <button
         className="btn btn-primary"
         style={{ width: '100%', marginBottom: 8 }}
         disabled={decided}
-        onClick={() => decide(true, alwaysAllow)}
+        onClick={() => decide(true, login ? false : alwaysAllow)}
       >
         Approve
       </button>
