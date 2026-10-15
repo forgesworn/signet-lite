@@ -1,0 +1,28 @@
+# My Signet Lite
+
+> A web-based Nostr remote signer (NIP-46), built as a static React PWA. It holds your key on the
+> device and signs for other Nostr apps over a relay, so your `nsec` never leaves it. Identities are
+> derived from one BIP-39 mnemonic with `nsec-tree`. It is an application to clone and run, not a
+> library to install from npm.
+
+Supports connect, get_public_key, sign_event, ping, switch_relays, nip44_encrypt, nip44_decrypt and
+nip04_decrypt (decrypt only). `nip04_encrypt` and `logout` are deliberately unsupported. Apps connect
+through a `bunker://` link made in Lite or a `nostrconnect://` link pasted into it.
+
+## Docs
+
+- [README](https://github.com/forgesworn/signet-lite/blob/main/README.md): features, quick start, supported NIP-46 methods, connecting a client with nostr-tools, layout
+- [AGENTS.md](https://github.com/forgesworn/signet-lite/blob/main/AGENTS.md): layer rules, invariants and the verify sequence for coding agents
+- [SECURITY.md](https://github.com/forgesworn/signet-lite/blob/main/SECURITY.md): how to report a vulnerability privately
+
+## Source
+
+- [src/engine/nip46.ts](https://github.com/forgesworn/signet-lite/blob/main/src/engine/nip46.ts): NIP-46 parsing, NIP-44 and NIP-04 helpers, `SUPPORTED_METHODS`
+- [src/engine/signer.ts](https://github.com/forgesworn/signet-lite/blob/main/src/engine/signer.ts): the `Signer` class, authorisation, approval gating, bunker secrets
+- [src/engine/relay.ts](https://github.com/forgesworn/signet-lite/blob/main/src/engine/relay.ts): relay transport
+- [src/ui/bunker-uri.ts](https://github.com/forgesworn/signet-lite/blob/main/src/ui/bunker-uri.ts): the `bunker://` URI format
+
+## Examples
+
+- [e2e/bunker-full.spec.ts](https://github.com/forgesworn/signet-lite/blob/main/e2e/bunker-full.spec.ts): a real `BunkerSigner` connecting through a `bunker://` link and getting a verified signature
+- [e2e/nostrconnect-full.spec.ts](https://github.com/forgesworn/signet-lite/blob/main/e2e/nostrconnect-full.spec.ts): the client-initiated `nostrconnect://` flow
