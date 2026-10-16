@@ -1,7 +1,8 @@
 {
   "name": "signet-lite",
   "version": "0.13.2",
-  "description": "My Signet Lite — a web-based Nostr remote signer (NIP-46) PWA",
+  "private": true,
+  "description": "My Signet Lite: a web-based Nostr remote signer (NIP-46) PWA",
   "license": "MIT",
   "repository": {
     "type": "git",
