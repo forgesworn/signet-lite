@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import * as QRCode from 'qrcode'
+import { encode, toSvg } from '@forgesworn/qr'
 
 export function Bunker({ uri, appName, identityName, onManageApps, onDone }: {
   uri: string
@@ -13,7 +13,13 @@ export function Bunker({ uri, appName, identityName, onManageApps, onDone }: {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    void QRCode.toDataURL(uri).then(setQr)
+    // Error correction M and a four-module quiet zone, black on white, as the
+    // previous encoder defaulted; an SVG stays sharp at the 180px it is shown at.
+    try {
+      setQr(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(toSvg(encode(uri, { ecc: 'M' }), { margin: 4 }))}`)
+    } catch {
+      setQr('') // too long for a QR code; the link above still works
+    }
   }, [uri])
 
   function handleCopy() {
