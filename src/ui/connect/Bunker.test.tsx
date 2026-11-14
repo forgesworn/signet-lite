@@ -2,12 +2,27 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import jsQR from 'jsqr'
+import { encode } from '@forgesworn/qr'
 import { Bunker } from './Bunker'
 
-// qrcode uses canvas APIs not available in jsdom — stub toDataURL so the component renders
-vi.mock('qrcode', () => ({
-  toDataURL: () => Promise.resolve('data:image/png;base64,stub'),
-}))
+/** Rasterises the QR's SVG data URL (one `M x y h w v1 h -w z` run per dark row segment) at 4 px a module. */
+function readQrImage(src: string): { text: string | undefined; modules: number } {
+  const svg = decodeURIComponent(src.slice(src.indexOf(',') + 1))
+  const side = Number(/viewBox="0 0 (\d+) \d+"/.exec(svg)![1])
+  const scale = 4
+  const px = side * scale
+  const pixels = new Uint8ClampedArray(px * px * 4).fill(255)
+  for (const [, x, y, w] of svg.matchAll(/M(\d+) (\d+)h(\d+)v1/g)) {
+    for (let row = Number(y) * scale; row < (Number(y) + 1) * scale; row++) {
+      for (let col = Number(x) * scale; col < (Number(x) + Number(w)) * scale; col++) {
+        const i = (row * px + col) * 4
+        pixels[i] = pixels[i + 1] = pixels[i + 2] = 0
+      }
+    }
+  }
+  return { text: jsQR(pixels, px, px)?.data, modules: side }
+}
 
 afterEach(cleanup)
 
@@ -18,6 +33,15 @@ describe('Bunker', () => {
     render(<Bunker uri={SAMPLE_URI} onManageApps={() => {}} onDone={() => {}} />)
     expect(screen.getByTestId('bunker-uri')).toHaveTextContent(SAMPLE_URI)
     expect(screen.getByRole('button', { name: /copy/i })).toBeInTheDocument()
+  })
+
+  it('renders a QR that a decoder reads back as the bunker URI, with a four-module quiet zone', async () => {
+    render(<Bunker uri={SAMPLE_URI} onManageApps={() => {}} onDone={() => {}} />)
+    const img = await screen.findByAltText('bunker QR')
+    const { text, modules } = readQrImage(img.getAttribute('src')!)
+    expect(text).toBe(SAMPLE_URI)
+    expect(modules).toBe(encode(SAMPLE_URI, { ecc: 'M' }).size + 8)
+    expect(img).toHaveStyle({ width: '180px', height: '180px' })
   })
 
   it('shows "Waiting for an app to connect" when appName is undefined', () => {
