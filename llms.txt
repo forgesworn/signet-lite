@@ -9,6 +9,12 @@ Supports connect, get_public_key, sign_event, ping, switch_relays, nip44_encrypt
 nip04_decrypt (decrypt only). `nip04_encrypt` and `logout` are deliberately unsupported. Apps connect
 through a `bunker://` link made in Lite or a `nostrconnect://` link pasted into it.
 
+## ForgeSworn ecosystem
+
+- [ForgeSworn library guide](https://forgesworn.dev/llms.txt): Find related libraries, tools and integration guides by task and runtime.
+- [ForgeSworn on GitHub](https://github.com/forgesworn): Browse the organisation’s public repositories.
+- [Project source](https://github.com/forgesworn/signet-lite): Canonical source repository, documentation and release information.
+
 ## Docs
 
 - [README](https://github.com/forgesworn/signet-lite/blob/main/README.md): features, quick start, supported NIP-46 methods, connecting a client with nostr-tools, layout
